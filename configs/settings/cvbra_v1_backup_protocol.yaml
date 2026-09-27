@@ -1,0 +1,117 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cross_visibility_balanced_replay_adaptation_v1
+method:
+  paper_name: CVBRA
+  version: v1
+  full_name: cross_visibility_balanced_replay_adaptation
+  detector: yolo11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  frozen_layer_indices_inclusive:
+  - 0
+  - 9
+  trainable_layer_indices_inclusive:
+  - 10
+  - 23
+  endpoint: fixed_last_epoch_without_metric_selection
+  final_frozen_state_rule: exact_source_restore_for_all_layer_0_to_9_parameters_and_buffers
+  additional_source_return: none
+  inference:
+    architecture: identical_to_source_yolo11n
+    detector_passes_identity: 1
+    parameter_count_change: 0
+    flop_change: 0
+    optional_comparator: horizontal_flip_with_hard_nms
+training_dataset:
+  target:
+    source: UAV_OBB_v4_official_train_development_A
+    scenes: 900
+    views_per_scene:
+    - original
+    - fog_0p6
+    - fog_1p0
+    images_per_epoch: 2700
+    geometry_and_labels: identical_across_the_three_views
+    role_change: development_A_is_training_only_and_is_not_CVBRA_selection_evidence
+    training_projection:
+      rule: intersect_exact_HBB_with_image_extent_for_YOLO_training_only
+      rationale: Ultralytics_normalized_HBB_training_contract
+      exact_evaluation_annotations_modified: false
+      official_scored_boxes_outside_image_extent_observed_in_A: 517
+      degenerate_intersections: exclude_from_training_only
+  source_replay:
+    source: HazyDet_official_train_original_hazy
+    available_scenes: 8000
+    selected_scenes: 900
+    selection: smallest_sha256_of_seed_text_colon_official_image_id
+    seed_text: cvbra-v1-source-replay-2026-08-14
+    images_per_epoch: 900
+    labels: data/processed/hazydet_yolo/labels/train
+    development_validation_or_test_used: false
+  total_images_per_epoch: 3600
+  target_to_source_replay_ratio: 3_to_1
+  categories_in_detector_order:
+  - car
+  - truck
+  - bus
+optimization:
+  epochs: 8
+  checkpoint: fixed_last_epoch
+  checkpoint_selected_by_metric: false
+  imgsz: 1280
+  batch: 2
+  device: cuda_0
+  workers: 4
+  seed: 42
+  deterministic: true
+  amp: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  degrees: 0.0
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  translate: 0.1
+  scale: 0.3
+  external_validation_during_training: false
+reserve_B_execution:
+  source: UAV_OBB_v4_official_train_untouched_reserve_B
+  images: 483
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  controlled_fog_beta:
+  - 0.6
+  - 1.0
+  primary_view: fog_1p0
+  models:
+  - source
+  - CVBRA_v1
+  methods:
+  - Identity
+  - Flip_HardNMS
+  inference_repetitions: 2
+  label_blind_order:
+  - materialize_registered_views_without_labels
+  - run_all_detector_cells_twice_and_lock_predictions
+  - extract_only_reserve_B_labels
+  - convert_exact_car_truck_bus_ontology_and_score
+  same_for_all_cells:
+    imgsz: 1280
+    probe_conf: 0.08
+    publish_conf: 0.25
+    nms_iou: 0.7
+    max_det: 500
+    fp16: true

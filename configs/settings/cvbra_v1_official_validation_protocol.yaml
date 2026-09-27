@@ -1,0 +1,70 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_uav_obb_official_validation
+data:
+  dataset: UAV-OBB-v4
+  archive: data/raw/UAV_OBB_v4/downloads/UAV-OBB-dlaCi7.zip
+  split: official_valid
+  images: 218
+  labels: 218
+  official_test_access: prohibited
+  label_blind_order:
+  - extract_and_hash_only_official_validation_images
+  - materialize_original_and_two_registered_fog_views
+  - run_all_detector_cells_twice_and_lock_predictions
+  - extract_only_official_validation_labels
+  - convert_exact_car_truck_bus_ontology_and_score
+method:
+  candidate: CVBRA_v1
+  checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+  comparator: weights/hazydet/yolo11n_best.pt
+  architecture: identical_one_pass_yolo11n
+  models:
+  - source
+  - CVBRA_v1
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  primary_view: fog_1p0
+  methods:
+  - Identity
+  - Flip_HardNMS
+  inference_repetitions: 2
+  same_for_all_cells:
+    imgsz: 1280
+    probe_conf: 0.08
+    publish_conf: 0.25
+    nms_iou: 0.7
+    max_det: 500
+    fp16: true
+confirmation:
+  role: one_shot_external_official_validation_after_method_freeze
+  all_checks_required: true
+  point_checks:
+    CVBRA_Identity_original_AP_delta_vs_source: positive
+    CVBRA_Identity_primary_fog_AP_delta_vs_source: positive
+    CVBRA_Flip_original_AP_delta_vs_source: positive
+    CVBRA_Flip_primary_fog_AP_delta_vs_source: positive
+    CVBRA_Identity_primary_fog_AP75_delta_vs_source: nonnegative
+  latency_checks:
+    CVBRA_Identity_maximum_ratio_vs_source: at_most_1.05
+    CVBRA_Flip_maximum_ratio_vs_source: at_most_1.05
+  reproducibility: exact_prediction_sha256
+  confirmatory_statistics:
+    bootstrap_unit: image
+    bootstrap_replicates: 10000
+    bootstrap_seed: 20260814
+    interval: paired_percentile_95_percent
+    primary_comparisons:
+    - CVBRA_Identity_vs_source_Identity_original
+    - CVBRA_Identity_vs_source_Identity_fog_1p0
+    - CVBRA_Flip_vs_source_Flip_original
+    - CVBRA_Flip_vs_source_Flip_fog_1p0
+    multiple_testing: Holm_four_primary_comparisons
+    effect_size: paired_bootstrap_delta_AP_divided_by_bootstrap_standard_deviation
+    minimum_confirmatory_claim: identity_primary_fog_point_positive_and_95_percent_interval_above_zero
+  fail_action:
+    freeze_negative_official_validation_evidence: mandatory
+    official_test_access: prohibited
+    universal_generalization_claim: prohibited

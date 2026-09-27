@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cvbra-research"
+version = "0.1.0"
+description = "CVBRA UAV vehicle detector adaptation research code"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+  "torch", "torchvision", "ultralytics==8.4.53", "numpy>=1.26,<3",
+  "opencv-python-headless", "Pillow", "PyYAML", "scipy", "numba>=0.60,<1",
+  "pydantic>=2", "pandas", "pycocotools", "matplotlib", "psutil",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra"

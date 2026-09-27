@@ -1,0 +1,96 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_training_seed_robustness
+registered_at: 2026-08-14 23:20:00+08:00
+purpose:
+  question: Are the frozen CVBRA-v1 target adaptation and source-retention effects
+    stable across independently seeded training runs under the identical data and
+    optimizer contract?
+  role: post_freeze_training_variability_audit
+  primary_method_checkpoint_replacement: prohibited
+  method_or_hyperparameter_selection: prohibited
+  endpoint_selection: fixed_last_epoch_only
+fixed_training_data:
+  dataset_yaml: data/processed/cvbra_v1/dataset.yaml
+  manifest: data/processed/cvbra_v1/manifest.json
+  images_per_epoch: 3600
+  target_original: 900
+  target_fog_0p6: 900
+  target_fog_1p0: 900
+  source_haze_replay: 900
+fixed_training:
+  architecture: YOLO11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  primary_seed: 42
+  additional_seeds:
+  - 27182
+  - 31415
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  device: cuda:0
+  workers: 4
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  freeze_during_training: layers_0_through_9
+  final_state_rule: exact_source_restore_for_all_layer_0_through_9_parameters_and_buffers
+  augmentation:
+    fliplr: 0.5
+    translate: 0.1
+    scale: 0.3
+    all_color_projective_mosaic_mixup_copy_paste: disabled
+  deterministic: true
+  amp: true
+  checkpoint_selected_by_metric: false
+evaluation:
+  inference:
+    method: Identity
+    imgsz: 1280
+    probe_conf: 0.08
+    publish_conf: 0.25
+    nms_iou: 0.7
+    max_det: 500
+    fp16: true
+    chunk_size: 8
+  target:
+    dataset: UAV-OBB official validation
+    labels_previously_accessed: true
+    role: descriptive_post_freeze_seed_robustness
+    primary_scope: train_disjoint_167_images_141_source_groups
+    views:
+    - original
+    - fog_1p0
+  source:
+    dataset: HazyDet validation
+    labels_previously_accessed: true
+    role: descriptive_post_freeze_source_retention_seed_robustness
+    manifest: data/manifests/hazydet_val_manifest.json
+    annotation: data/raw/HazyDet/val/val_coco.json
+    images: 1000
+analysis:
+  endpoints:
+  - seed_42
+  - seed_27182
+  - seed_31415
+  report:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  variability:
+  - mean
+  - sample_standard_deviation
+  - minimum
+  - maximum
+  fixed_robustness_checks:
+    every_seed_target_original_delta_vs_source_at_least: 0.2
+    every_seed_target_fog_1p0_delta_vs_source_at_least: 0.18
+    target_AP_sample_standard_deviation_at_most: 0.03
+    every_seed_HazyDet_AP_at_least: 0.44
+  failed_check_consequence: report_without_endpoint_or_method_reselection

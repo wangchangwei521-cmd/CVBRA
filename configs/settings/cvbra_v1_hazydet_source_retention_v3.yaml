@@ -1,0 +1,47 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_hazydet_source_retention_order_parity_v3
+parent_v2:
+  protocol: configs/experiment/cvbra_v1_hazydet_source_retention_v2.yaml
+  runner: scripts/run_cvbra_v1_hazydet_source_retention_v2.py
+failure_diagnosis:
+  direct_evaluator_image_order: lexicographic_string_sort
+  v2_bootstrap_image_order: annotation_order
+  tied_fp16_detection_scores_present: true
+  stable_score_sort_makes_tie_order_AP_relevant: true
+  observed_CVBRA_minus_source_direct_delta: -0.0351853933253464
+  observed_CVBRA_minus_source_v2_bootstrap_delta: -0.0351661729459501
+  absolute_point_difference: 1.92203793962231e-05
+  v2_bootstrap_disposition: preserve_and_exclude
+  v2_direct_point_metrics_disposition: valid_but_recomputed_in_v3
+v3_analysis:
+  image_order_for_direct_and_bootstrap: lexicographic_string_sort
+  point_parity_tolerance: 1.0e-12
+  bootstrap_encoding: singleton_cluster_per_image
+  singleton_cluster_is_exact_image_bootstrap: true
+  accelerated_AP_only_cache: true
+  resamples: 2000
+  seed: 20260814
+  interval: paired_percentile_95_percent
+  comparisons:
+  - CVBRA_v1_minus_source
+  - CVBRA_v1_minus_STF
+  - CVBRA_v1_minus_CVBRA_noCV
+  - CVBRA_v1_minus_CVBRA_noReplay
+  - CVBRA_v1_minus_CVBRA_noFreeze
+  multiple_testing: Holm_across_five_AP_contrasts
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  full_annotation_image_scope: 1000
+  source_anchor_AP: 0.5169972340948197
+  source_anchor_maximum_absolute_drift: 0.0025
+evidence_boundary:
+  validation_labels_previously_accessed: true
+  descriptive_post_freeze: true
+  independent_confirmation_claim: prohibited
+  negative_null_and_positive_results: retain

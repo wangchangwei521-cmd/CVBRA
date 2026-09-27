@@ -1,0 +1,26 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v2_aldi_hn_paired_analysis_v1
+question: What are the paired target and source-retention AP differences between the
+  schedule-normalized equal-information ALDI++-AF comparator and the confirmatory
+  CVBRA-L10 or response-refined CVBRA-L5 endpoints?
+target_analysis:
+  population: 167 train-disjoint UAV-OBB validation images
+  resampling_unit: 141 canonical source-key groups
+  resamples: 10000
+  contrasts:
+  - CVBRA-L10 minus ALDI++-AF-HN equal
+  - CVBRA-L5 minus ALDI++-AF-HN equal
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  multiple_testing: Holm across all six contrasts
+source_retention_analysis:
+  population: 1000 HazyDet validation images
+  resampling_unit: image
+  resamples: 2000
+  contrasts:
+  - CVBRA-L10 minus ALDI++-AF-HN equal
+  - CVBRA-L5 minus ALDI++-AF-HN equal
+  multiple_testing: Holm across both contrasts

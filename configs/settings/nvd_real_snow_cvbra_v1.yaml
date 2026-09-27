@@ -1,0 +1,178 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: nvd_real_snow_cvbra_v1
+purpose:
+  question: Does the fixed CVBRA response transfer to a real snowy UAV domain at a
+    new location?
+  role: independent_real_adverse_weather_confirmation_not_method_selection
+  dataset: Nordic Vehicle Dataset (NVD)
+  publication: Mokayed et al., Nordic Vehicle Dataset (NVD), CVPRW 2023
+  homepage: https://nvd.ltu-ai.dev/Home.html
+  repository: https://github.com/amrdev-pixel/Nordic-Vehicle-Dataset
+  repository_commit: 20c410085d71b4f4780e0bfd418e9c9fca3698c5
+  license: CC-BY-NC
+  license_role: scientific_research_only
+splits:
+  source_train:
+    role: fixed_source_training
+    location: Asjo
+    date: 2022-12-02
+    snow_cover: minimal_0_to_1_cm
+    cloud_cover: overcast
+    xml: data/raw/NVD/annotated_videos/2022-12-02_Asjo_01_stabilized/2022-12-02 Asjo
+      01_stabilized.xml
+    media: data/raw/NVD/annotated_videos/2022-12-02_Asjo_01_stabilized/2022-12-02
+      Asjo 01_stabilized.MP4
+    frame_start: 0
+    frame_stop: 3043
+    selection: deterministic_even_spacing
+    selected_frames: 900
+  source_retention:
+    role: independent_source_domain_retention_only
+    location: Nyland
+    date: 2022-12-03
+    snow_cover: minimal_0_to_1_cm
+    cloud_cover: dense
+    xml: data/raw/NVD/annotated_videos/2022-12-03_Nyland_01_stabilized/2022-12-03
+      Nyland 01_stabilized.xml
+    media: data/raw/NVD/annotated_videos/2022-12-03_Nyland_01_stabilized/2022-12-03
+      Nyland 01_stabilized.mp4
+    frame_start: 0
+    frame_stop: 2525
+    selection: all_frames
+    selected_frames: 2526
+  target_adaptation:
+    role: unlabeled_target_adaptation_input_with_labels_used_only_for_training_supervision
+    location: Asjo
+    date: 2022-12-23
+    snow_cover: fresh_5_to_10_cm
+    cloud_cover: clear
+    xml: data/raw/NVD/annotated_videos/2022-12-23_Asjo_01_HD_5x_stab/2022-12-23 Asjo
+      01_HD 5x stab.xml
+    media: data/raw/NVD/annotated_videos/2022-12-23_Asjo_01_HD_5x_stab/2022-12-23
+      Asjo 01_HD 5x stab.MP4
+    frame_start: 0
+    frame_stop: 2479
+    selection: deterministic_even_spacing
+    selected_frames: 900
+  target_validation:
+    role: directional_validation_without_selection_or_protocol_change
+    location: Bjenberg
+    date: 2022-12-04
+    snow_cover: fresh_1_to_2_cm
+    cloud_cover: light
+    xml: data/raw/NVD/annotated_videos/2022-12-04_Bjenberg_02/2022-12-04 Bjenberg
+      02.xml
+    media: data/raw/NVD/annotated_videos/2022-12-04_Bjenberg_02/2022-12-04 Bjenberg
+      02.MP4
+    frame_start: 0
+    frame_stop: 5165
+    selection: deterministic_even_spacing
+    selected_frames: 1000
+  target_test:
+    role: held_out_final_real_heavy_snow_test
+    location: Bjenberg
+    date: 2022-12-23
+    snow_cover: fresh_5_to_10_cm
+    cloud_cover: clear
+    xml: data/raw/NVD/annotated_videos/2022-12-23_Bjenberg_02_stabilized/2022-12-23
+      Bjenberg 02_stabilized.xml
+    media: data/raw/NVD/annotated_videos/2022-12-23_Bjenberg_02_stabilized/2022-12-23
+      Bjenberg 02_stabilized
+    source_archive: data/raw/NVD/source/2022-12-23_Bjenberg_02_stabilized.zip
+    frame_start: 0
+    frame_stop: 2026
+    selection: all_extracted_frames
+    selected_frames: 2027
+geometry:
+  class_names:
+  - car
+  category_id: 1
+  projection: enclosing_axis_aligned_box_of_cvat_center_rotated_rectangle
+  outside_boxes: exclude
+  partial_boxes: clip_to_image_extent
+  empty_frames: retain_as_negatives
+source_training:
+  initialization: weights/pretrained/yolo11n.pt
+  epochs: 50
+  imgsz: 1280
+  batch: 2
+  seed: 42
+  endpoint: fixed_last_epoch
+  validation_during_training: false
+  checkpoint_selected_by_metric: false
+adaptation:
+  methods:
+  - STF
+  - NoVisibility_L10
+  - CVBRA_L10
+  seeds:
+  - 42
+  - 27182
+  - 31415
+  target_scenes: 900
+  target_slots_per_epoch: 2700
+  source_replay_slots_per_epoch:
+    STF: 0
+    NoVisibility_L10: 900
+    CVBRA_L10: 900
+  total_images_per_epoch: 3600
+  views:
+    STF:
+    - original
+    - original
+    - original
+    - original
+    NoVisibility_L10:
+    - original
+    - original
+    - original
+    - source_replay
+    CVBRA_L10:
+    - original
+    - fog_beta_0p6
+    - fog_beta_1p0
+    - source_replay
+  frozen_layer_indices_inclusive:
+    STF: null
+    NoVisibility_L10:
+    - 0
+    - 9
+    CVBRA_L10:
+    - 0
+    - 9
+  exact_final_source_restore_for_frozen_state: true
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  endpoint: fixed_last_epoch
+  validation_during_training: false
+  checkpoint_selected_by_metric: false
+evaluation:
+  splits:
+  - source_retention
+  - target_validation
+  - target_test
+  candidate_score_floor: 0.001
+  nms_iou: 0.7
+  max_detections_per_image: 500
+  imgsz: 1280
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  trajectory_summary: mean_sample_standard_deviation_and_paired_t_interval
+  primary_seed_for_temporal_inference: 42
+  primary_bootstrap_contrasts:
+  - CVBRA_L10_minus_source
+  - CVBRA_L10_minus_STF
+  - CVBRA_L10_minus_NoVisibility_L10

@@ -1,0 +1,27 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+amendment: cvbra_v1_final_test_v1_1_uav_class_mapping_correction
+parent_protocol: configs/experiment/cvbra_v1_final_test_v1.yaml
+failure:
+  stage: UAV_OBB_test_label_conversion_preflight
+  observed_metadata_order:
+  - bike
+  - bus
+  - car
+  - other_vehicle
+  - taxi
+  - truck
+  invalid_implementation_assumption: first_three_released_indices_equal_car_truck_bus
+  test_box_label_content_accessed_before_failure: false
+  test_metric_accessed_before_failure: false
+correction:
+  rule: Resolve released class indices by exact case-insensitive class name in the
+    locked archive data.yaml, then map car, truck, and bus to model/COCO category
+    IDs 1, 2, and 3 respectively; ignore all nonshared categories.
+  expected_resolved_mapping:
+    released_index_1_bus: model_category_3
+    released_index_2_car: model_category_1
+    released_index_5_truck: model_category_2
+  geometry_rule: unchanged_enclosing_horizontal_rectangle
+  threshold_checkpoint_prediction_or_metric_change: prohibited
+  outcome_dependent_branch: false

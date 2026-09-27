@@ -1,0 +1,50 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v2_aldi_horizon_normalized_v1
+purpose:
+  question: Does CVBRA remain competitive when the ALDI++ anchor-free equal-supervision
+    comparator uses an EMA horizon normalized to the much shorter matched eight-epoch
+    optimization budget?
+  role: stronger_same_information_recent_method_control
+  replace_original_ALDI_translation: false
+  report_original_and_horizon_normalized_variants: true
+derivation:
+  official_YOLO_schedule_iterations: 50000
+  official_ema_alpha: 0.9996
+  official_post_initialization_ema_updates: 49999
+  matched_run_optimizer_updates: 599
+  matched_post_initialization_ema_updates: 598
+  normalized_ema_alpha: 0.9671024549752264
+  rule: Both implementations copy the first updated student into the teacher. The
+    remaining alpha_normalized^598 equals 0.9996^49999, matching the relative EMA
+    horizon across the official and matched schedules.
+  uses_validation_or_test_performance: false
+information_contract:
+  source: 900 labeled HazyDet replay images per epoch
+  target: 2700 labeled UAV-OBB view images per epoch
+  target_distillation: enabled
+  all_layers_trainable: true
+  inference_endpoint: fixed_last_epoch_EMA_teacher
+  first_teacher_update: exact_student_copy_as_in_official_EMA_START_ITER_0
+training:
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  seed: 42
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  deterministic: true
+  validation_during_training: false
+evaluation:
+  validation:
+    target: 167 train-disjoint UAV-OBB images
+    source: 1000 HazyDet images
+  test:
+    target: 16 UAV-OBB images
+    source: 2000 HazyDet images
+    role: post hoc fixed-model comparison
+  negative_results_retained: true

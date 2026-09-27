@@ -1,0 +1,61 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_hazydet_source_retention_mapping_correction_v2
+failure_diagnosis:
+  invalid_export_mapping:
+    detector_class_0: 1
+    detector_class_1: 2
+    detector_class_2: 3
+  annotation_categories:
+    car: 0
+    truck: 1
+    bus: 2
+  invalid_evaluation_image_scope: prediction_image_ids_only
+  required_evaluation_image_scope: all_1000_annotation_image_ids
+  invalid_attempt_disposition: preserve_and_exclude_from_scientific_evidence
+correction:
+  operation: subtract_one_from_category_id
+  source_category_ids:
+  - 1
+  - 2
+  - 3
+  target_category_ids:
+  - 0
+  - 1
+  - 2
+  immutable_fields:
+  - image_id
+  - bbox
+  - score
+  - row_order
+  raw_inference_rerun: false
+  row_count_and_field_identity_audit: mandatory
+  evaluate_all_annotation_images_including_zero_detection_images: true
+dataset:
+  name: HazyDet
+  split: validation
+  images_count: 1000
+  annotation: data/raw/HazyDet/val/val_coco.json
+  validation_labels_previously_accessed: true
+  independent_confirmation_claim: prohibited
+analysis:
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  primary_contrast: CVBRA_v1_minus_source
+  secondary_contrasts: CVBRA_v1_minus_each_matched_baseline
+  paired_bootstrap:
+    unit: image
+    resamples: 2000
+    seed: 20260814
+    interval: paired_percentile_95_percent
+    multiple_testing: Holm_across_five_AP_contrasts
+  historical_source_anchor:
+    AP: 0.5169972340948197
+    maximum_absolute_drift: 0.0025
+    role: implementation_sanity_check_only
+  positive_null_and_negative_results: retain

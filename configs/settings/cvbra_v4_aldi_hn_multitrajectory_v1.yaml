@@ -1,0 +1,65 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v4_aldi_hn_multitrajectory_v1
+purpose:
+  question: Does the horizon-normalized equal-information ALDI++-AF comparison persist
+    across independent training trajectories?
+  role: fixed_comparator_replication_not_method_selection
+  prior_single_trajectory_seed: 42
+  additional_predeclared_seeds:
+  - 27182
+  - 31415
+  complete_seed_set:
+  - 42
+  - 27182
+  - 31415
+method:
+  detector: YOLO11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  variant: ALDIpp_AF_equal_information_horizon_normalized
+  official_ema_alpha: 0.9996
+  official_reference_updates: 50000
+  matched_updates: 599
+  normalized_ema_alpha: 0.9671024549752264
+  first_teacher_update: exact_student_copy
+  endpoint: fixed_last_epoch_EMA_teacher
+  detector_passes_identity: 1
+training:
+  dataset: data/processed/cvbra_v1/dataset.yaml
+  manifest: data/processed/cvbra_v1/manifest.json
+  target_images_per_epoch: 2700
+  labeled_source_replay_images_per_epoch: 900
+  total_images_per_epoch: 3600
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  device: cuda_0
+  workers: 4
+  deterministic: true
+  amp: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  checkpoint_selected_by_metric: false
+  validation_during_training: false
+evaluation:
+  splits:
+  - UAV_OBB_official_validation_primary_167
+  - HazyDet_validation_1000
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  - HazyDet
+  candidate_score_floor: 0.001
+  nms_iou: 0.7
+  max_detections_per_image: 500
+  target_grouping: 141_source_key_clusters
+  report:
+  - per_trajectory_COCO_AP
+  - mean_and_sample_standard_deviation
+  - paired_CVBRA_L10_minus_ALDI_difference_by_seed
+  - paired_mean_and_95_percent_t_interval

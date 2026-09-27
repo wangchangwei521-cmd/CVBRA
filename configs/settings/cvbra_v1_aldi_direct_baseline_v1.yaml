@@ -1,0 +1,149 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_aldi_direct_baseline_v1
+scientific_role:
+  primary_method: immutable_CVBRA_v1
+  role: post_freeze_descriptive_recent_DAOD_comparison
+  method_or_hyperparameter_reselection: prohibited
+  negative_or_null_results_must_be_reported: true
+  claim_boundary: This study does not turn the comparator into a new proposed method
+    and does not claim that the anchor-free translation is the authors' official code.
+recent_method_source:
+  method: ALDI_plus_plus
+  paper: Align_and_Distill_Unifying_and_Improving_Domain_Adaptive_Object_Detection
+  venue: Transactions_on_Machine_Learning_Research_Featured_2025
+  primary_url: https://openreview.net/forum?id=ssXSrZ94sR
+  arxiv: https://arxiv.org/abs/2403.12029
+  official_repository: https://github.com/justinkay/aldi
+  official_YOLO_recipe:
+    detector: YOLOv5m
+    source_supervision: strong_view_detection_loss
+    target_supervision: EMA_teacher_weak_to_strong_distillation
+    target_pseudo_threshold: 0.8
+    target_pseudo_nms_iou: 0.65
+    ema_alpha: 0.9996
+    target_MIC_ratio: 0.5
+    enabled_distillation:
+    - soft_classification
+    - soft_objectness
+    - pseudo_box_regression
+translation:
+  name: ALDIpp_AF_Y11
+  detector: exact_project_YOLO11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  reason: The official YOLO implementation is anchor-based YOLOv5. The registered
+    translation preserves the official source-strong, EMA-teacher, weak-to-strong
+    target, MIC, soft-confidence/class, and pseudo-box roles on the project's anchor-free
+    YOLO11n. YOLO11n has no separate objectness head, so confidence-map distillation
+    replaces the YOLOv5 objectness term.
+  source_strong_augmentation:
+    color_jitter_probability: 0.8
+    jitter_range:
+    - 0.6
+    - 1.4
+    grayscale_probability: 0.2
+    gaussian_blur_probability: 0.5
+    gaussian_sigma_range:
+    - 0.1
+    - 2.0
+    random_erasing:
+    - probability: 0.7
+      scale:
+      - 0.05
+      - 0.2
+      ratio:
+      - 0.3
+      - 3.3
+    - probability: 0.5
+      scale:
+      - 0.02
+      - 0.2
+      ratio:
+      - 0.1
+      - 6.0
+    - probability: 0.3
+      scale:
+      - 0.02
+      - 0.2
+      ratio:
+      - 0.05
+      - 8.0
+  target_strong_augmentation:
+    color_jitter_probability: 0.8
+    jitter_range:
+    - 0.6
+    - 1.4
+    grayscale_probability: 0.2
+    gaussian_blur_probability: 0.5
+    gaussian_sigma_range:
+    - 0.1
+    - 2.0
+    random_erasing: disabled_as_in_official_ALDI_YOLO_config
+    MIC:
+      ratio: 0.5
+  distillation:
+    confidence_map_BCE_weight: 0.7
+    foreground_soft_class_CE_weight: 0.3
+    pseudo_box_and_DFL: exact_YOLO11_detection_box_terms_with_hard_teacher_boxes
+    temperature: 1.0
+    empty_pseudo_batch: retain_soft_confidence_distillation
+variants:
+  ALDIpp_AF_Y11_native_UDA:
+    information_contract: labeled_source_plus_unlabeled_target
+    target_ground_truth_used_for_training: false
+    purpose: native_contract_recent_DAOD_reference
+  ALDIpp_AF_Y11_equal_supervision:
+    information_contract: labeled_source_plus_labeled_target
+    target_ground_truth_used_for_training: true
+    additional_target_distillation: true
+    purpose: direct_same_information_comparator_to_CVBRA
+common_training_contract:
+  dataset: exact_locked_CVBRA_v1_multiset
+  dataset_yaml: data/processed/cvbra_v1/dataset.yaml
+  manifest: data/processed/cvbra_v1/manifest.json
+  target_original: 900
+  target_fog_0p6: 900
+  target_fog_1p0: 900
+  fixed_source_replay: 900
+  images_per_epoch: 3600
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  device: cuda_0
+  workers: 4
+  seed: 42
+  deterministic: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  geometric_augmentation:
+    fliplr: 0.5
+    translate: 0.1
+    scale: 0.3
+    mosaic_mixup_copy_paste_color_and_projective: disabled_before_ALDI_strong_view
+  all_layers_trainable: true
+  validation_during_training_for_selection: false
+  endpoint: fixed_last_epoch_EMA_teacher
+  target_or_source_validation_tuning: prohibited
+evaluation:
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  target_resampling:
+    unit: canonical_source_key_group
+    groups: 141
+    resamples: 10000
+    seed: 20260822
+  source_resampling:
+    unit: image
+    images: 1000
+    resamples: 2000
+    seed: 20260822
+  multiplicity: Holm_within_registered_direct_contrast_family

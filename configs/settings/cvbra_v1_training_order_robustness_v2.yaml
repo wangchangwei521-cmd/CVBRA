@@ -1,0 +1,97 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_training_order_robustness_v2
+registered_at: 2026-08-15 01:00:00+08:00
+purpose:
+  question: Do the frozen CVBRA-v1 target-adaptation and source-retention effects
+    survive explicit changes to the effective training-sample order while the training
+    multiset, source initialization, optimizer, augmentations, endpoint, and evaluation
+    protocol remain fixed?
+  role: post_freeze_effective_order_robustness_audit
+  trigger: The earlier exposed-seed audit produced identical optimization states and
+    is retained only as bitwise-reproducibility evidence.
+  primary_method_checkpoint_replacement: prohibited
+  method_or_hyperparameter_selection: prohibited
+  endpoint_selection: fixed_last_epoch_only
+fixed_training_multiset:
+  base_dataset_manifest: data/processed/cvbra_v1/manifest.json
+  order_manifest: data/processed/cvbra_v1_order_robustness_v2/manifest.json
+  images_per_epoch: 3600
+  same_image_and_label_multiset_for_every_order: true
+  image_or_label_bytes_modified: false
+registered_endpoints:
+- id: primary_locked
+  checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+  order_role: historical_primary
+- id: hash_a
+  dataset_yaml: data/processed/cvbra_v1_order_robustness_v2/dataset_hash_a.yaml
+  train_list: data/processed/cvbra_v1_order_robustness_v2/train_hash_a.txt
+- id: hash_b
+  dataset_yaml: data/processed/cvbra_v1_order_robustness_v2/dataset_hash_b.yaml
+  train_list: data/processed/cvbra_v1_order_robustness_v2/train_hash_b.txt
+fixed_training:
+  architecture: YOLO11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  exposed_seed: 42
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  device: cuda:0
+  workers: 4
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  freeze_during_training: layers_0_through_9
+  final_state_rule: exact_source_restore_for_all_layer_0_through_9_parameters_and_buffers
+  augmentation:
+    fliplr: 0.5
+    translate: 0.1
+    scale: 0.3
+    all_color_projective_mosaic_mixup_copy_paste: disabled
+  deterministic: true
+  amp: true
+  checkpoint_selected_by_metric: false
+evaluation:
+  reuse_exact_v1_prediction_settings: true
+  target:
+    dataset: UAV-OBB official validation
+    labels_previously_accessed: true
+    role: descriptive_post_freeze_order_robustness
+    primary_scope: train_disjoint_167_images_141_source_groups
+    views:
+    - original
+    - fog_1p0
+  source:
+    dataset: HazyDet validation
+    labels_previously_accessed: true
+    role: descriptive_post_freeze_source_retention_order_robustness
+    images: 1000
+analysis:
+  endpoints:
+  - primary_locked
+  - hash_a
+  - hash_b
+  report:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  variability:
+  - mean
+  - sample_standard_deviation
+  - minimum
+  - maximum
+  fixed_effective_perturbation_checks:
+    each_new_endpoint_trainable_state_differs_from_primary: true
+    new_endpoint_trainable_states_differ_from_each_other: true
+  fixed_robustness_checks:
+    every_endpoint_target_original_delta_vs_source_at_least: 0.2
+    every_endpoint_target_fog_1p0_delta_vs_source_at_least: 0.18
+    target_AP_sample_standard_deviation_at_most: 0.03
+    every_endpoint_HazyDet_AP_at_least: 0.44
+  failed_check_consequence: report_without_endpoint_or_method_reselection

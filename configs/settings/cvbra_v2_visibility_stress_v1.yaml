@@ -1,0 +1,34 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v2_visibility_stress_v1
+purpose:
+  question: 'Do the fixed CVBRA endpoints retain their target advantage under visibility
+    changes not used in adaptation: a stronger spatial fog severity and a low-light
+    transformation from a different corruption family?'
+  role: fixed_model_visibility_stress_test
+  dataset_addition: false
+population:
+  dataset: UAV-OBB official validation
+  source_view: original
+stress_conditions:
+  fog_1p3:
+    operator: existing seeded spatial atmospheric-scattering corruption
+    beta: 1.3
+    relation_to_training: unseen stronger severity
+  low_light_1p5:
+    operator: deterministic gamma transform
+    gamma: 1.5
+    relation_to_training: unseen corruption family
+fixed_models:
+- source
+- STF
+- ALDIpp_AF_equal
+- ALDIpp_AF_HN_equal
+- CVBRA_L10
+- CVBRA_L5
+evaluation:
+  metric: COCO AP at IoU 0.50:0.05:0.95
+  imgsz: 1280
+  publish_conf: 0.25
+  max_det: 500
+  report_every_model_condition: true

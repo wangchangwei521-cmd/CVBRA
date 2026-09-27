@@ -1,0 +1,66 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: nvd_real_snow_cvbra_v1_1
+base_protocol:
+  name: nvd_real_snow_cvbra_v1
+  config: configs/experiment/nvd_real_snow_cvbra_v1.yaml
+retained_endpoints:
+  source: runs/nvd_real_snow_cvbra_v1/source/source_yolo11n.pt
+  trajectory_seed_42:
+    STF: runs/nvd_real_snow_cvbra_v1/STF/seed_42/STF_seed_42.pt
+    NoVisibility_L10: runs/nvd_real_snow_cvbra_v1/NoVisibility_L10/seed_42/NoVisibility_L10_seed_42.pt
+    CVBRA_L10: runs/nvd_real_snow_cvbra_v1/CVBRA_L10/seed_42/CVBRA_L10_seed_42.pt
+withdrawn_endpoints:
+  seeds:
+  - 27182
+  - 31415
+  role: audit_only_never_used_for_metric_or_trajectory_inference
+  original_files_retained: true
+replacement_trajectories:
+  methods:
+  - STF
+  - NoVisibility_L10
+  - CVBRA_L10
+  seeds:
+  - 27182
+  - 31415
+  order_realization: deterministic_seeded_permutation_encoded_by_lexicographic_alias_slots
+  permutation_algorithm: python_random_mt19937_shuffle_of_locked_base_manifest_rows
+  dataset_multiset_must_equal_base: true
+  effective_tensor_state_must_differ_from_seed_42_and_other_replacement: true
+preserved_contract:
+  target_scenes: 900
+  samples_per_epoch: 3600
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  endpoint: fixed_last_epoch
+  validation_during_training: false
+  checkpoint_selected_by_metric: false
+  target_test_access_during_training: false
+  method_streams_layer_masks_and_augmentations: unchanged_from_base_protocol
+evaluation:
+  unchanged_from_base_protocol: true
+  splits:
+  - source_retention
+  - target_validation
+  - target_test
+  candidate_score_floor: 0.001
+  nms_iou: 0.7
+  max_detections_per_image: 500
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  primary_seed_for_temporal_inference: 42
+  target_test_images: 2027
+  all_registered_results_retained: true

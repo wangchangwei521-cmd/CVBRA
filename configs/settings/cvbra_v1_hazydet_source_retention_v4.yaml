@@ -1,0 +1,41 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_hazydet_source_retention_recentered_bootstrap_v4
+parent_predictions:
+  prediction_change_in_v4: false
+v3_diagnosis:
+  direct_source_AP: 0.5176728478165689
+  renumbered_source_AP: 0.5177009146075794
+  direct_CVBRA_v1_AP: 0.4824874544912225
+  renumbered_CVBRA_v1_AP: 0.4824848292829973
+  direct_delta: -0.0351853933253464
+  renumbered_delta: -0.0352160853245821
+  deterministic_delta_offset_direct_minus_renumbered: 3.06919992357e-05
+  cause: COCO_bootstrap_requires_duplicate_image_renumbering_and_tied_FP16_scores_make_AP_tie_order_sensitive
+v4_statistics:
+  direct_metric: standard_COCO_AP_on_original_image_ids
+  raw_bootstrap: COCO_AP_after_required_resample_image_renumbering
+  recenter_rule: adjusted_delta_i_equals_raw_delta_i_plus_direct_delta_minus_raw_observed_delta
+  rule_applied_to_every_comparison_without_threshold_or_outcome_branching: true
+  interval: percentile_95_percent_of_adjusted_deltas
+  p_value: two_sided_sign_probability_of_adjusted_deltas
+  standardized_effect: direct_delta_divided_by_raw_bootstrap_standard_deviation
+  raw_and_adjusted_statistics_both_retained: true
+  point_parity_after_recentering: exact
+  image_order: lexicographic_string_sort
+  bootstrap_encoding: singleton_cluster_per_image
+  accelerated_AP_only_cache: true
+  resamples: 2000
+  seed: 20260814
+  comparisons:
+  - CVBRA_v1_minus_source
+  - CVBRA_v1_minus_STF
+  - CVBRA_v1_minus_CVBRA_noCV
+  - CVBRA_v1_minus_CVBRA_noReplay
+  - CVBRA_v1_minus_CVBRA_noFreeze
+  multiple_testing: Holm_across_five_adjusted_AP_contrasts
+evidence_boundary:
+  validation_labels_previously_accessed: true
+  descriptive_post_freeze: true
+  independent_confirmation_claim: prohibited
+  negative_null_and_positive_results: retain

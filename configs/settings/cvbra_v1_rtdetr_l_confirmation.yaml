@@ -1,0 +1,90 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_rtdetr_l_cross_detector_confirmation
+method:
+  paper_name: CVBRA
+  version: v1-rtdetr-l-confirmation
+  detector: RT-DETR-L
+  source_checkpoint: weights/hazydet/rtdetr_l_best.pt
+  model_layers: 29
+  frozen_layer_indices_inclusive:
+  - 0
+  - 9
+  trainable_layer_indices_inclusive:
+  - 10
+  - 28
+  frozen_boundary_semantics: feature_extraction_backbone_frozen_neck_decoder_trainable
+  final_frozen_state_rule: exact_source_restore_for_all_layer_0_to_9_parameters_and_buffers
+  endpoint: fixed_last_epoch_without_metric_selection
+  inference_architecture: identical_to_source_RT-DETR-L
+  parameter_count_change: 0
+  detector_passes_identity: 1
+training_dataset:
+  reuse: data/processed/cvbra_v1/dataset.yaml
+  manifest: data/processed/cvbra_v1/manifest.json
+  target_images_per_epoch: 2700
+  source_haze_replay_images_per_epoch: 900
+  total_images_per_epoch: 3600
+  target_to_source_replay_ratio: 3_to_1
+  data_equation_identical_to_yolo11n_CVBRA: true
+optimization:
+  epochs: 2
+  rationale: predeclared_compute_capped_cross_detector_direction_check
+  checkpoint: fixed_last_epoch
+  checkpoint_selected_by_metric: false
+  validation_during_training: false
+  imgsz: 640
+  batch: 1
+  device: cuda_0
+  workers: 4
+  seed: 42
+  deterministic: true
+  amp: true
+  optimizer: auto_architecture_default
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  degrees: 0.0
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  translate: 0.1
+  scale: 0.3
+evaluation:
+  split: UAV-OBB-v4 official validation
+  validation_labels_already_accessed_for_frozen_yolo11n_confirmation: true
+  metric_or_label_feedback_allowed_during_RTDETR_training: false
+  primary_scope: 167_train_disjoint_images_in_141_source_key_groups
+  secondary_scope: all_218_official_validation_images
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  primary_view: fog_1p0
+  methods:
+  - Identity
+  - Flip_HardNMS
+  models:
+  - source
+  - CVBRA_v1_RTDETR_L
+  inference_repetitions: 2
+  same_for_all_cells:
+    imgsz: 1280
+    probe_conf: 0.08
+    publish_conf: 0.25
+    nms_iou: 0.7
+    max_det: 500
+    fp16: true
+  direction_checks:
+    Identity_original_AP_delta: nonnegative
+    Identity_primary_fog_AP_delta: nonnegative
+    Flip_original_AP_delta: nonnegative
+    Flip_primary_fog_AP_delta: nonnegative
+    Identity_primary_fog_AP75_delta: nonnegative
+    prediction_reproducibility: exact
+    maximum_latency_ratio: at_most_1.05
+  universal_stability_claim: prohibited

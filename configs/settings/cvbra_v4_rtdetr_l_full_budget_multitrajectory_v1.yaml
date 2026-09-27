@@ -1,0 +1,62 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v4_rtdetr_l_full_budget_multitrajectory_v1
+purpose:
+  question: Does CVBRA transfer to RT-DETR-L under the same eight-epoch information
+    horizon used by the primary YOLO11n study?
+  role: fixed_cross_detector_full_budget_replication_not_method_selection
+  historical_direction_check_epochs: 2
+  predeclared_seeds:
+  - 42
+  - 27182
+  - 31415
+method:
+  detector: RT-DETR-L
+  source_checkpoint: weights/hazydet/rtdetr_l_best.pt
+  model_layers: 29
+  frozen_layer_indices_inclusive:
+  - 0
+  - 9
+  trainable_layer_indices_inclusive:
+  - 10
+  - 28
+  frozen_state_rule: exact_source_restore_for_layers_0_to_9_at_final_endpoint
+  endpoint: fixed_last_epoch
+  detector_passes_identity: 1
+  parameter_count_change: 0
+training:
+  dataset: data/processed/cvbra_v1/dataset.yaml
+  manifest: data/processed/cvbra_v1/manifest.json
+  target_images_per_epoch: 2700
+  source_haze_replay_images_per_epoch: 900
+  total_images_per_epoch: 3600
+  epochs: 8
+  horizon_match: primary_YOLO11n_and_ALDI_comparators
+  imgsz: 640
+  batch: 1
+  device: cuda_0
+  workers: 4
+  deterministic: true
+  amp: true
+  optimizer: auto_architecture_default
+  warmup_epochs: 1.0
+  checkpoint_selected_by_metric: false
+  validation_during_training: false
+evaluation:
+  splits:
+  - UAV_OBB_official_validation_primary_167
+  - HazyDet_validation_1000
+  views:
+  - original
+  - fog_0p6
+  - fog_1p0
+  - HazyDet
+  inference_imgsz: 1280
+  candidate_score_floor: 0.001
+  nms_iou: 0.7
+  max_detections_per_image: 500
+  report:
+  - source_and_per_trajectory_COCO_AP
+  - mean_and_sample_standard_deviation
+  - paired_adapted_minus_source_difference_by_seed
+  - paired_mean_and_95_percent_t_interval

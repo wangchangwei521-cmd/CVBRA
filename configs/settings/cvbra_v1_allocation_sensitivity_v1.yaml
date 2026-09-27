@@ -1,0 +1,120 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_allocation_and_freeze_boundary_sensitivity_v1
+scientific_questions:
+  replay_allocation: How does the four-coordinate target/source response change as
+    the labeled source replay fraction q_S increases from zero to the primary 0.25
+    setting while the fixed 3,600-sample epoch budget and layers 0--9 boundary are
+    held?
+  plasticity_boundary: How does the same response change when the first trainable
+    YOLO11n layer is moved across 0, 5, 10, and 15 under the exact primary CVBRA data
+    multiset?
+common_training_contract:
+  detector: yolo11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  epochs: 8
+  images_per_epoch: 3600
+  imgsz: 1280
+  batch: 2
+  device: cuda_0
+  workers: 4
+  exposed_seed: 42
+  deterministic: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  augmentation:
+    fliplr: 0.5
+    translate: 0.1
+    scale: 0.3
+    mosaic_mixup_copy_paste_color_and_projective: disabled
+  validation_during_training: false
+  endpoint: fixed_last_epoch_without_metric_selection
+  post_training_frozen_state_rule: exact_source_restore_for_every_registered_frozen_layer
+replay_allocation_axis:
+  fixed_first_trainable_layer: 10
+  fixed_target_view_balance: equal_global_counts_across_original_fog_0p6_fog_1p0
+  cells:
+    qS_0:
+      role: reuse_locked_CVBRA_noReplay
+      q:
+        original: 0.333333333333
+        fog_0p6: 0.333333333333
+        fog_1p0: 0.333333333334
+        source: 0.0
+      counts:
+        original: 1200
+        fog_0p6: 1200
+        fog_1p0: 1200
+        source: 0
+    qS_0p125:
+      role: new_registered_training
+      q:
+        original: 0.291666666667
+        fog_0p6: 0.291666666667
+        fog_1p0: 0.291666666666
+        source: 0.125
+      counts:
+        original: 1050
+        fog_0p6: 1050
+        fog_1p0: 1050
+        source: 450
+      construction: Retain all 900 unique scenes per target view, add one deterministic
+        alias for image IDs 1--150 in each view, and retain the first 450 rows of
+        the already locked 900-image source replay registry.
+    qS_0p25:
+      role: reuse_locked_primary_CVBRA_v1
+      q:
+        original: 0.25
+        fog_0p6: 0.25
+        fog_1p0: 0.25
+        source: 0.25
+      counts:
+        original: 900
+        fog_0p6: 900
+        fog_1p0: 900
+        source: 900
+  scope_boundary: The one-sided grid preserves complete target-scene coverage at every
+    nonzero-replay cell under the fixed 3,600-sample budget. It is a response sensitivity
+    audit, not an optimization or proof that q_S=0.25 is optimal.
+plasticity_boundary_axis:
+  fixed_data: exact_locked_primary_CVBRA_v1_3600_sample_multiset
+  cells:
+    first_trainable_0:
+      role: reuse_locked_CVBRA_noFreeze
+      frozen_layers: []
+      trainable_layers_inclusive:
+      - 0
+      - 23
+    first_trainable_5:
+      role: new_registered_training
+      frozen_layers_inclusive:
+      - 0
+      - 4
+      trainable_layers_inclusive:
+      - 5
+      - 23
+    first_trainable_10:
+      role: reuse_locked_primary_CVBRA_v1
+      frozen_layers_inclusive:
+      - 0
+      - 9
+      trainable_layers_inclusive:
+      - 10
+      - 23
+    first_trainable_15:
+      role: new_registered_training
+      frozen_layers_inclusive:
+      - 0
+      - 14
+      trainable_layers_inclusive:
+      - 15
+      - 23
+  scope_boundary: discrete_boundary_response_not_continuous_layerwise_causal_identification
+training_variability_evidence:
+  interpretation: three_independently_materialized_effective_sample_orders
+  exposed_seed_audit: ineffective_because_learned_states_were_bitwise_identical
+  stochastic_seed_variance_claim: prohibited

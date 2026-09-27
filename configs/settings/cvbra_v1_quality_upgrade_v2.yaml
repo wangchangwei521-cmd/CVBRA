@@ -1,0 +1,187 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_jei_quality_upgrade_v2
+evidence_boundary:
+  primary_method: CVBRA_v1
+  primary_checkpoint_and_existing_results: immutable
+  UAV_OBB_official_test_access: prohibited
+  HazyDet_test_access: prohibited
+  validation_labels_previously_accessed: true
+  new_work_role: post_freeze_descriptive_quality_and_mechanism_evidence
+  method_checkpoint_threshold_or_hyperparameter_reselection: prohibited
+  retain_every_registered_result: true
+factorial_analysis:
+  question: separate_visibility_coverage_early_feature_preservation_and_their_interaction
+  factors:
+    visibility_views:
+    - present
+    - absent
+    early_layer_freezing:
+    - present
+    - absent
+  fixed_source_replay: 900_images
+  cells:
+    present_present: CVBRA_v1
+    absent_present: CVBRA_noCV
+    present_absent: CVBRA_noFreeze
+    absent_absent: PlainMix
+  outcomes:
+  - UAV_OBB_train_disjoint_original_AP
+  - UAV_OBB_train_disjoint_fog_1p0_AP
+  - HazyDet_validation_AP
+  estimands:
+    visibility_main_effect: 0.5*((present_present-absent_present)+(present_absent-absent_absent))
+    freezing_main_effect: 0.5*((present_present-present_absent)+(absent_present-absent_absent))
+    interaction: present_present-present_absent-absent_present+absent_absent
+  target_resampling:
+    unit: canonical_source_key_group
+    groups: 141
+    resamples: 10000
+    seed: 20260821
+  HazyDet_resampling:
+    unit: image
+    images: 1000
+    resamples: 2000
+    seed: 20260821
+  interval: paired_percentile_95_percent
+  multiplicity: Holm_across_the_nine_registered_factorial_estimands
+threshold_robustness:
+  prediction_source: locked_raw_identity_predictions_with_probe_confidence_0p08
+  models:
+  - source
+  - CVBRA_v1
+  - CVBRA_noCV
+  - CVBRA_noFreeze
+  - PlainMix
+  views:
+  - original
+  - fog_1p0
+  confidence_thresholds:
+  - 0.08
+  - 0.1
+  - 0.15
+  - 0.2
+  - 0.25
+  - 0.3
+  - 0.35
+  - 0.4
+  metrics:
+  - AP
+  - AP50
+  - AP75
+  primary_check: source_to_CVBRA_AP_delta_remains_positive_at_every_threshold
+  threshold_or_model_selection: prohibited
+group_influence:
+  comparison: CVBRA_v1_minus_source
+  views:
+  - original
+  - fog_1p0
+  operation: leave_one_canonical_source_key_group_out
+  groups: 141
+  report:
+  - minimum_delta
+  - maximum_delta
+  - maximum_absolute_shift_from_full_delta
+  - proportion_positive
+  - most_influential_group
+training_variability:
+  exposed_seed_audit:
+    reason: three_configured_seeds_produced_bitwise_identical_learned_states
+    stochastic_seed_variance_claim: prohibited
+  effective_order_audit:
+    endpoints:
+    - primary_locked
+    - hash_a
+    - hash_b
+    same_training_multiset: true
+    learned_trainable_states_differ: true
+    role: valid_three_endpoint_effective_training_sequence_robustness
+  new_blind_seed_claim: prohibited
+retention_baseline:
+  name: CVBRA_EWC
+  role: standard_continual_learning_retention_comparator
+  method_family: diagonal_empirical_Fisher_elastic_weight_consolidation
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  training_multiset: exact_CVBRA_v1_dataset
+  target_original: 900
+  target_fog_0p6: 900
+  target_fog_1p0: 900
+  source_replay: 900
+  images_per_epoch: 3600
+  all_layers_trainable: true
+  Fisher:
+    samples: exact_900_fixed_source_replay_aliases
+    exposure: one_fixed_manifest_order_pass_with_registered_training_augmentations
+    estimator: mean_squared_gradient_of_per_image_detection_loss
+    parameters: every_trainable_floating_parameter
+    penalty: Fisher_weighted_mean_squared_displacement_from_source_checkpoint
+  strength_calibration:
+    validation_free: true
+    reference_displacement: one_percent_of_each_parameter_tensors_source_RMS
+    reference_penalty_fraction_of_mean_source_detection_loss: 0.05
+    coefficient_selection_from_validation_or_final_metrics: prohibited
+  training:
+    epochs: 8
+    imgsz: 1280
+    batch: 2
+    seed: 42
+    deterministic: true
+    optimizer: SGD
+    lr0: 0.00075
+    lrf: 0.1
+    momentum: 0.937
+    weight_decay: 0.0005
+    warmup_epochs: 1.0
+    augmentation:
+      fliplr: 0.5
+      translate: 0.1
+      scale: 0.3
+      mosaic_mixup_copy_paste_color_and_projective: disabled
+    validation_during_training: false
+    endpoint: fixed_last_epoch_without_metric_selection
+  interpretation: matched_known_retention_baseline_not_a_new_method
+paper_revision:
+  article_type: JEI_Research_Paper
+  official_template: SPIE_spieman_12pt_US_letter_line_numbered_double_spaced_review_manuscript
+  required_main_sequence:
+  - Introduction
+  - Related_Work
+  - Materials_and_Methods
+  - Results
+  - Discussion
+  - Conclusion
+  abstract_max_words: 200
+  keywords:
+  - 3
+  - 6
+  target_main_body_words:
+  - 5500
+  - 6500
+  results_interpretation_separation: mandatory
+  defensive_writing: prohibited
+  engineering_log_narration_in_main_text: prohibited
+  component_level_novelty_claim: prohibited
+  central_claims:
+  - adaptation_is_an_accuracy_retention_allocation_problem
+  - CVBRA_is_a_minimal_architecture_preserving_operating_point
+  - matched_factorial_and_retention_controls_resolve_mechanism_roles
+  figures:
+    replace_redundant_raw_AP_bar_panel_with_registered_effect_size_forest_plot: true
+    retain_target_retention_Pareto_panel: true
+  literature_contract_table:
+    required: true
+    compare_fields:
+    - supervision_contract
+    - source_access
+    - online_update
+    - added_inference_pass_or_branch
+    - source_retention_measured
+    - architecture_changed
+  validity_subsection: required
+  reference_policy:
+    cited_only: true
+    DOI_or_authoritative_URL_required_when_available: true
+    Crossref_or_primary_publisher_verification: mandatory
+    unverifiable_reference: prohibited
+  English_Chinese_numeric_citation_and_structure_parity: mandatory
+  compile_validate_and_render_every_final_page: mandatory

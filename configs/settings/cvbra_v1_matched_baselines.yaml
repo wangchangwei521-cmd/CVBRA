@@ -1,0 +1,148 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_matched_supervision_baselines
+common_contract:
+  detector: yolo11n
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  source_dataset_yaml: data/processed/cvbra_v1/dataset.yaml
+  source_manifest: data/processed/cvbra_v1/manifest.json
+  training_images_per_epoch: 3600
+  epochs: 8
+  checkpoint: fixed_last_epoch_without_metric_selection
+  imgsz: 1280
+  batch: 2
+  device: cuda_0
+  workers: 4
+  seed: 42
+  deterministic: true
+  amp: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  mosaic: 0.0
+  mixup: 0.0
+  copy_paste: 0.0
+  hsv_h: 0.0
+  hsv_s: 0.0
+  hsv_v: 0.0
+  degrees: 0.0
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  translate: 0.1
+  scale: 0.3
+  validation_during_training: false
+  metric_selected_epoch_or_checkpoint: false
+  architecture_parameter_and_detector_pass_budget: identical_to_source_and_CVBRA_v1
+baselines:
+  STF:
+    paper_label: standard_target_finetuning
+    purpose: strong_ordinary_supervised_target_adaptation_baseline
+    target_original_aliases_per_scene: 4
+    target_fog_views_per_scene: 0
+    source_replay_images: 0
+    unique_target_scenes: 900
+    images_per_epoch: 3600
+    frozen_layer_indices_inclusive: []
+    trainable_layer_indices_inclusive:
+    - 0
+    - 23
+    final_state_rule: fixed_last_epoch_all_layers
+  CVBRA_noCV:
+    paper_label: cross_visibility_removal_control
+    purpose: isolate_cross_visibility_balance
+    target_original_aliases_per_scene: 3
+    target_fog_views_per_scene: 0
+    source_replay_images: 900
+    unique_target_scenes: 900
+    images_per_epoch: 3600
+    frozen_layer_indices_inclusive:
+    - 0
+    - 9
+    trainable_layer_indices_inclusive:
+    - 10
+    - 23
+    final_state_rule: exact_source_restore_for_layers_0_to_9
+  CVBRA_noReplay:
+    paper_label: source_replay_removal_control
+    purpose: isolate_source_replay_anchor
+    target_views_per_scene:
+    - original
+    - fog_0p6
+    - fog_1p0
+    extra_alias_rule: one extra target alias per scene; original for image_id mod
+      3 equals 1, fog_0p6 for image_id mod 3 equals 2, and fog_1p0 for image_id mod
+      3 equals 0
+    global_images_by_view:
+      original: 1200
+      fog_0p6: 1200
+      fog_1p0: 1200
+    source_replay_images: 0
+    unique_target_scenes: 900
+    images_per_epoch: 3600
+    frozen_layer_indices_inclusive:
+    - 0
+    - 9
+    trainable_layer_indices_inclusive:
+    - 10
+    - 23
+    final_state_rule: exact_source_restore_for_layers_0_to_9
+  CVBRA_noFreeze:
+    paper_label: frozen_backbone_removal_control
+    purpose: isolate_early_backbone_preservation
+    dataset: exact_locked_CVBRA_v1_2700_target_plus_900_source_replay
+    images_per_epoch: 3600
+    frozen_layer_indices_inclusive: []
+    trainable_layer_indices_inclusive:
+    - 0
+    - 23
+    final_state_rule: fixed_last_epoch_all_layers
+evaluation:
+  uav_obb_official_validation:
+    role: descriptive_post_freeze_mechanism_comparison
+    primary_scope: frozen_167_images_in_141_train_disjoint_source_key_groups
+    views:
+    - original
+    - fog_0p6
+    - fog_1p0
+    methods:
+    - Identity
+    - Flip_HardNMS
+    repetitions: 2
+    reference_source_and_CVBRA_predictions: reuse_existing_locked_cells
+    same_inference_settings:
+      imgsz: 1280
+      probe_conf: 0.08
+      publish_conf: 0.25
+      nms_iou: 0.7
+      max_det: 500
+      fp16: true
+  source_retention:
+    dataset: HazyDet_validation
+    role: descriptive_post_freeze_source_domain_audit
+    methods:
+    - Identity
+    models:
+    - source
+    - CVBRA_v1
+    - STF
+    - CVBRA_noCV
+    - CVBRA_noReplay
+    - CVBRA_noFreeze
+    model_or_hyperparameter_selection: prohibited
+reporting:
+  mandatory:
+  - raw_AP_AP50_AP75_for_every_model_view_and_method
+  - CVBRA_minus_each_baseline_deltas
+  - paired_source_group_bootstrap_intervals_for_primary_identity_contrasts
+  - latency_and_checkpoint_size
+  - transparent_known_label_post_freeze_boundary
+  interpretation:
+    standard_target_finetuning: strong_baseline_not_an_ablation_component
+    one_factor_controls: descriptive_mechanism_evidence
+    negative_or_null_control_outcomes: retain_and_report
+    main_method_reselection: prohibited

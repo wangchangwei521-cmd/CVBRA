@@ -1,0 +1,69 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_dronevehicle_rgb_validation_post_freeze_audit
+test_guard:
+  DroneVehicle_official_test_consumed_historically_for_prior_method: true
+  new_test_inference_or_metric_access: prohibited
+  allowed_split: official_RGB_validation_only
+dataset:
+  name: DroneVehicle
+  split: external_rgb_val
+  images: 1469
+  root: data/processed/dronevehicle_rgb_val
+  annotation: data/processed/dronevehicle_rgb_val/annotations/dronevehicle_rgb_val.coco.json
+  categories:
+  - car
+  - truck
+  - bus
+  category_ids:
+  - 1
+  - 2
+  - 3
+  evaluated_image_scope: all_1469_annotation_images
+models:
+  source:
+    role: frozen_historical_validation_anchor_reused_without_reinference
+    checkpoint: weights/hazydet/yolo11n_best.pt
+    prediction: runs/dronevehicle_baseline_107eaabc808d/predictions/final.coco.json
+    historical_AP: 0.25292349701906747
+  CVBRA_v1:
+    role: frozen_main_candidate
+    checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+  STF:
+    role: matched_standard_target_finetuning_control
+    checkpoint: runs/cvbra_v1_matched_baselines/STF/STF.pt
+inference:
+  method: Identity
+  exact_parent_config: runs/dronevehicle_baseline_107eaabc808d/config_resolved.yaml
+  changed_fields_only:
+  - detector.model
+  - experiment.name
+  imgsz: 1280
+  probe_conf: 0.08
+  publish_conf: 0.25
+  nms_iou: 0.7
+  max_det: 500
+  fp16: true
+  device: cuda_0
+  stream_chunk_records: 16
+analysis:
+  point_metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  per_class: true
+  contrasts:
+  - CVBRA_v1_minus_source
+  - CVBRA_v1_minus_STF
+  paired_bootstrap:
+    unit: image
+    encoding: singleton_cluster_per_image
+    resamples: 2000
+    seed: 20260814
+    direct_point_recenter_rule: adjusted_delta_i_equals_raw_delta_i_plus_direct_delta_minus_raw_observed_delta
+    interval: paired_percentile_95_percent
+    multiplicity: Holm_across_two_within_dataset_AP_contrasts
+  latency_and_checkpoint_size: report

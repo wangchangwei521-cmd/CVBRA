@@ -1,0 +1,67 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_final_held_out_test_v1
+fixed_models:
+  source:
+    checkpoint: weights/hazydet/yolo11n_best.pt
+    information_contract: labeled_source_only
+  CVBRA_v1:
+    checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+    information_contract: labeled_source_plus_labeled_target
+  ALDIpp_AF_equal:
+    checkpoint: runs/cvbra_v1_aldi_direct_baseline_v1/equal_supervision/ALDIpp_AF_Y11_equal_supervision.pt
+    information_contract: labeled_source_plus_labeled_target_plus_registered_teacher_distillation
+fixed_inference:
+  detector: yolo11n
+  imgsz: 1280
+  probe_conf: 0.08
+  publish_conf: 0.25
+  nms_iou: 0.7
+  max_det: 500
+  fp16: true
+  method: Identity
+  detector_passes: 1
+  checkpoint_or_threshold_selection_from_test: prohibited
+UAV_OBB_test:
+  archive: data/raw/UAV_OBB_v4/downloads/UAV-OBB-dlaCi7.zip
+  released_images: 16
+  label_content_access_before_registration: false
+  archive_member_names_listed_before_registration: true
+  views:
+    original: released_test_image
+    fog_0p6: deterministic_registered_fog_beta_0p6_geometry_preserving
+    fog_1p0: deterministic_registered_fog_beta_1p0_geometry_preserving
+  shared_ontology:
+  - car
+  - truck
+  - bus
+  oriented_to_horizontal_rule: enclosing_axis_aligned_rectangle_of_each_released_polygon
+  primary_reporting: AP_AP50_AP75_for_each_model_and_view
+  inference_before_label_extraction_and_conversion: mandatory
+  interpretation: small_n_directional_held_out_target_confirmation
+HazyDet_test:
+  annotation: data/raw/HazyDet/test/test_coco.json
+  released_images: 2000
+  image_variant: hazy
+  shared_ontology:
+  - car
+  - truck
+  - bus
+  primary_reporting: AP_AP50_AP75_for_each_model
+  interpretation: held_out_source_retention_assessment
+  audit_incident:
+    annotation_file_opened_during_inventory_before_registration: true
+    command_nature: read_only_Get_Content_Raw_during_file_availability_audit
+    predictions_or_metrics_computed_before_registration: false
+    model_checkpoint_or_threshold_changed_after_open: false
+    label_blind_preregistration_claim: prohibited
+    independence_boundary: The split remained unused for training, method selection,
+      checkpoint selection, or threshold selection, but it is reported as post-freeze
+      held-out evidence rather than a label-blind preregistered test.
+reporting:
+  retain_every_model_and_view_result: true
+  no_test_driven_method_revision: true
+  no_claim_that_16_UAV_OBB_images_establish_population_level_superiority: true
+  UAV_OBB_uncertainty: image_bootstrap_95_percent_interval_for_CVBRA_minus_each_comparator
+  HazyDet_uncertainty: image_bootstrap_95_percent_interval_for_CVBRA_minus_each_comparator
+  multiplicity: Holm_within_each_dataset_registered_AP_contrast_family

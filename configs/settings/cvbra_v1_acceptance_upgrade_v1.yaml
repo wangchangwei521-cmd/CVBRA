@@ -1,0 +1,84 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_jei_acceptance_upgrade
+scientific_position:
+  primary_method: CVBRA_v1
+  CVBRA_v1_definition_and_frozen_results: immutable
+  contribution_type:
+  - supervised_UAV_adaptation_risk_allocation_problem
+  - minimal_single_pass_instantiation
+  - mechanism_resolved_accuracy_retention_evidence
+  - grouped_statistical_and_resource_evaluation_protocol
+  prohibited_claims:
+  - component_level_first_or_novel_claim
+  - universal_improvement
+  - state_of_the_art_target_AP
+  - natural_fog_confirmation_before_independent_evidence
+  - small_object_specific_method
+existing_evidence_upgrade:
+  direct_recent_literature_comparison: mandatory
+  target_retention_pareto_display:
+    allowed_inputs: frozen_matched_ablation_metrics_only
+    scalar_posthoc_score: prohibited
+    axes:
+      x: mean_of_original_and_fog_1p0_AP
+      y: HazyDet_AP
+    model_selection_or_threshold_selection: prohibited
+  training_resource_accounting:
+    allowed_inputs:
+    - locked_results_csv_elapsed_time
+    - locked_sample_budget
+    - locked_checkpoint_size
+    historical_peak_VRAM_inference: prohibited
+new_strong_baseline:
+  name: PlainMix
+  role: fully_trainable_plain_source_target_mixture
+  purpose: complete_the_visibility_by_freezing_factorial_under_fixed_source_replay
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  target_original_aliases_per_scene: 3
+  target_fog_views_per_scene: 0
+  source_replay_images: 900
+  unique_target_scenes: 900
+  images_per_epoch: 3600
+  frozen_layer_indices_inclusive: []
+  trainable_layer_indices_inclusive:
+  - 0
+  - 23
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  seed: 42
+  deterministic: true
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  validation_during_training: false
+  checkpoint: fixed_last_epoch_without_metric_selection
+  interpretation: descriptive_post_freeze_strong_control_not_method_selection
+natural_visibility_gate:
+  required: true
+  admissible_source_requirements:
+  - lawful_research_use_terms_are_final_and_recorded
+  - independent_from_CVBRA_training_and_model_selection
+  - UAV_vehicle_labels_and_visibility_condition_are_traceable
+  - scene_or_sequence_grouping_is_available_or_conservatively_reconstructed
+  - zero_tuning_protocol_is_locked_before_predictions_or_condition_metrics
+  DRTV30K:
+    reason: repository_states_final_license_will_be_provided_and_contains_placeholder_language
+  Bridge_Diverse_Weather_DroneVehicle:
+    reason: Hugging_Face_dataset_is_gated_and_requires_contact_information_sharing
+    independent_dataset_claim: prohibited_because_global_DroneVehicle_validation_was_already_reported
+  A2I2_Haze:
+    admissible_role_if_obtained: independent_controlled_real_haze_confirmation
+second_detector_gate:
+  current_RT_DETR_L_two_epoch_result:
+    role: direction_only
+    universal_architecture_claim: prohibited
+  full_budget_replication:
+    preferred_action: train_a_memory_feasible_RT_DETR_variant_for_eight_epochs_under_the_same_3600_sample_budget
+    validation_feedback_during_training: prohibited
+official_test:
+  UAV_OBB_official_test_access: prohibited
+  release_condition: separate_preregistered_final_gate_after_all_new_evidence_is_frozen

@@ -1,0 +1,47 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_interleaved_latency_audit
+registered_at: 2026-08-14 23:15:00+08:00
+purpose:
+  question: Do checkpoints with the same YOLO11n graph have practically equivalent
+    one-pass latency when execution order and GPU warm-up are controlled?
+  role: post_freeze_resource_audit
+  method_or_hyperparameter_selection: prohibited
+  accuracy_labels_accessed: false
+models:
+  source:
+    checkpoint: weights/hazydet/yolo11n_best.pt
+  CVBRA_v1:
+    checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+  STF:
+    checkpoint: runs/cvbra_v1_matched_baselines/STF/STF.pt
+images:
+  source: data/manifests/hazydet_val_manifest.json
+  selection: first_192_after_numeric_image_id_sort
+  count: 192
+  labels_used: false
+inference:
+  device: cuda:0
+  precision: fp16
+  imgsz: 1280
+  conf: 0.08
+  iou: 0.7
+  max_det: 500
+  chunk_size: 8
+  warmup_images_per_model: 32
+  counterbalanced_cycles: 6
+  model_residency: simultaneous_after_warmup
+  execution: interleaved_by_chunk_with_all_six_model_orders
+  measured_quantity: detector_end_to_end_ms_per_image
+analysis:
+  primary_contrast: CVBRA_v1_over_source_latency_ratio
+  secondary_contrast: STF_over_source_latency_ratio
+  aggregation: median_of_six_counterbalanced_cycle_means
+  uncertainty: min_max_of_six_cycle_ratios
+  practical_equivalence_band:
+  - 0.85
+  - 1.15
+  feasibility_ceiling_vs_source: 1.5
+  report_checkpoint_bytes: true
+  report_parameter_and_state_schema_identity: true
+  retain_all_cycle_and_chunk_observations: true

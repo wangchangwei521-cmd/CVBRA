@@ -1,0 +1,61 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v1_auair_1hz_post_freeze_external_audit
+dataset:
+  name: AU-AIR-1Hz
+  frames: 6578
+  video_sequences: 8
+  annotation: data/processed/auair_1hz/annotations/auair_1hz.coco.json
+  selection_manifest: data/processed/auair_1hz/selection_manifest.json
+  categories:
+    detector_class_0: 1
+    detector_class_1: 2
+    detector_class_2: 3
+  evaluated_image_scope: all_6578_annotation_images
+models:
+  source:
+    role: frozen_historical_anchor_reused_without_reinference
+    checkpoint: weights/hazydet/yolo11n_best.pt
+    prediction: runs/auair1hz_yolo11n_b0_16a7c7c20c5d/predictions/final.coco.json
+    historical_AP: 0.07862021830969958
+  CVBRA_v1:
+    role: frozen_main_candidate
+    checkpoint: runs/cvbra_v1/yolo11n/cvbra_v1.pt
+  STF:
+    role: matched_standard_target_finetuning_control
+    checkpoint: runs/cvbra_v1_matched_baselines/STF/STF.pt
+inference:
+  method: Identity
+  exact_parent_config: runs/auair1hz_yolo11n_b0_16a7c7c20c5d/config_resolved.yaml
+  changed_fields_only:
+  - detector.model
+  - experiment.name
+  imgsz: 1280
+  probe_conf: 0.08
+  publish_conf: 0.25
+  nms_iou: 0.7
+  max_det: 500
+  fp16: true
+  device: cuda_0
+  stream_chunk_records: 16
+analysis:
+  point_metrics:
+  - AP
+  - AP50
+  - AP75
+  - AP_small
+  - AP_medium
+  - AP_large
+  per_class: true
+  contrasts:
+  - CVBRA_v1_minus_source
+  - CVBRA_v1_minus_STF
+  paired_bootstrap:
+    unit: released_video_sequence
+    clusters: 8
+    resamples: 10000
+    seed: 20260814
+    interval: paired_percentile_95_percent
+    multiplicity: Holm_across_two_AP_contrasts
+    eight_sequence_limitation: report
+  latency_and_checkpoint_size: report

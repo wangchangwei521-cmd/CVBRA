@@ -1,0 +1,72 @@
+# Scientific settings extract, not an original registration/lock file.
+schema_version: 1
+protocol: cvbra_v2_reviewer_closure_v1
+purpose:
+  question: Are the CVBRA layer-10 confirmatory endpoint and the layer-5 response-refined
+    endpoint stable across effective seed-controlled training trajectories, and does
+    the layer-5 validation dominance persist on the already released test splits without
+    changing the original endpoint?
+  role: reviewer_risk_closure
+  primary_endpoint_replacement: prohibited
+  report_every_registered_run: true
+replication:
+  seeds:
+  - 42
+  - 27182
+  - 31415
+  first_trainable_layers:
+  - 5
+  - 10
+  seed_42:
+    role: existing_fixed_endpoint
+    dataset_order: original_locked_order
+  seed_27182:
+    role: new_independent_training_trajectory
+    dataset_order: hash_a_effective_permutation
+  seed_31415:
+    role: new_independent_training_trajectory
+    dataset_order: hash_b_effective_permutation
+  effective_perturbation_requirement:
+    distinct_trainable_state_for_every_pair: true
+    distinct_seed_and_backend_visible_order_for_new_runs: true
+training:
+  source_checkpoint: weights/hazydet/yolo11n_best.pt
+  epochs: 8
+  imgsz: 1280
+  batch: 2
+  optimizer: SGD
+  lr0: 0.00075
+  lrf: 0.1
+  momentum: 0.937
+  weight_decay: 0.0005
+  warmup_epochs: 1.0
+  deterministic: true
+  amp: true
+  endpoint: fixed_last_epoch
+  validation_during_training: false
+evaluation:
+  target_validation:
+    dataset: UAV-OBB official validation
+    views:
+    - original
+    - fog_0p6
+    - fog_1p0
+  source_validation:
+    dataset: HazyDet validation
+    images: 1000
+  target_test:
+    dataset: UAV-OBB official test
+    images: 16
+    role: post hoc fixed-checkpoint stability check
+    population_level_superiority_claim: false
+  source_test:
+    dataset: HazyDet test
+    images: 2000
+    role: post hoc fixed-checkpoint stability check
+  inference:
+    imgsz: 1280
+    probe_conf: 0.08
+    publish_conf: 0.25
+    nms_iou: 0.7
+    max_det: 500
+    fp16: true
