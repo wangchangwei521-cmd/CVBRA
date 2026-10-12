@@ -51,7 +51,7 @@ HazyDet_test:
   interpretation: held_out_source_retention_assessment
   audit_incident:
     annotation_file_opened_during_inventory_before_registration: true
-    command_nature: read_only_Get_Content_Raw_during_file_availability_audit
+    command_nature: read_only_inventory_check
     predictions_or_metrics_computed_before_registration: false
     model_checkpoint_or_threshold_changed_after_open: false
     label_blind_preregistration_claim: prohibited

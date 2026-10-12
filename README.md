@@ -1,8 +1,8 @@
 # CVBRA
 
-Research code for **Cross-Visibility Balanced Replay Adaptation (CVBRA)** for
-vehicle detection in UAV imagery. CVBRA combines original/fog target views,
-source replay, and controlled layer updates while retaining single-pass inference.
+Code for **Cross-Visibility Balanced Replay Adaptation (CVBRA)**, a method for
+vehicle detection in UAV imagery. CVBRA combines original and fogged target
+views, source replay, and controlled layer updates with single-pass inference.
 
 The associated manuscript is *Visibility-aware single-inference domain adaptation
 for vehicle detection in unmanned aerial vehicle imagery with source-domain
@@ -10,17 +10,17 @@ preservation*.
 
 ## Contents
 
-- `scripts/`: training, data preparation, evaluation and analysis implementations.
-- `src/buse_uav/`: required shared modules, retaining the original package namespace.
+- `scripts/`: training, data preparation, evaluation and analysis.
+- `src/buse_uav/`: shared modules under the original package namespace.
 - `configs/settings/`: scientific settings extracted from the experiment protocols.
 - `splits/`: sample identities and split roles, without images or annotations.
 - `tests/`: four synthetic implementation test suites and their fixtures.
 - `docs/`: dataset sources, environment and reproduction instructions.
 
-This is a minimal code release. Internal reports, audit logs, aggregate result
-archives, contact details, benchmark imagery, annotations, model weights and
-prediction dumps are not included. Analysis scripts implement the original
-procedures but require separately obtained inputs to execute those analyses.
+The release contains code, settings and split identifiers. Dataset images,
+annotations, model weights, predictions and complete result archives are not
+included. Training and analysis require the inputs described in
+[Reproduction](docs/REPRODUCTION.md).
 
 ## Installation and checks
 
@@ -34,29 +34,28 @@ python tools/verify_release.py
 python -m pytest -q
 ```
 
-`verify_release.py` uses only the Python standard library. The tests use synthetic
-fixtures and do not reproduce the paper's GPU training. Changes in framework
-versions, hardware or training order can change results.
+`verify_release.py` uses only the Python standard library. The tests check
+implementation behavior with synthetic fixtures; full GPU training requires
+separate data and checkpoints. Framework versions, hardware and training order
+can affect results.
 
-Read [Reproduction](docs/REPRODUCTION.md) before running any experiment script.
-Some historical scripts default to a training stage and validate original local
-registration files. This repository is not a self-contained one-command rerun;
-it does not include those internal records or checkpoints. The settings extracts
-are documentation, not replacements for the original hash-validated lock files.
+Experiment scripts validate the original hash-checked registration files, which
+are not included. `configs/settings/` documents the scientific configuration;
+exact reproduction also requires the original execution locks. Some scripts
+default to training, so inspect their `--help` output before execution.
 
 ## Scientific scope
 
-The main evaluation is supervised HazyDet-to-UAV-OBB adaptation in a shared
-car/truck/bus horizontal-box space. The NVD experiment is a supplementary,
-car-only weather-boundary test, not a general claim of winter robustness.
-Source-domain loss and unresolved statistical contrasts must not be interpreted
-as guaranteed retention or equivalence. The NVD correction uses distinct training
-orders after ineffective seed-only repeats were identified before metrics;
-implementation details needed to understand it are retained in the code and docs.
+The main evaluation is supervised HazyDet-to-UAV-OBB adaptation with horizontal
+boxes for car, truck and bus. The supplementary NVD experiment is a car-only
+weather-boundary test. Its findings apply to the sampled sequences and do not
+establish general winter robustness. Source-domain loss remains, and unresolved
+statistical contrasts do not establish equivalence. Corrected NVD runs use
+distinct training orders after ineffective seed-only repeats were identified
+before metrics; see the reproduction notes for details.
 
 ## License
 
-The original copyright notice in `LICENSE` is retained. No new open-source reuse
-license has been selected; public code availability is not a new MIT/Apache
-permission grant. Dependencies and benchmark assets retain their respective
-terms; see [Third-party resources](THIRD_PARTY_LICENSES.md).
+See [LICENSE](LICENSE) for the original copyright notice. No additional
+open-source reuse license is provided. Dependencies and benchmark assets retain
+their respective terms; see [Third-party resources](THIRD_PARTY_LICENSES.md).
